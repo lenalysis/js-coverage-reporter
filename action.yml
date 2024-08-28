@@ -1,5 +1,6 @@
 name: 'JS Coverage Reporter'
-description: 'Reads a coverage-summary.json and reports information to the build page'
+description:
+  'Reads a coverage-summary.json and reports information to the build page'
 author: 'Lenalysis, Inc.'
 
 # Add your action's branding here. This will appear on the GitHub Marketplace.
@@ -23,7 +24,9 @@ inputs:
     description: 'JSON summary path (output file from IstanbulJS)'
     required: true
   output-file-path:
-    description: 'File path for the output file on disk (md is hard to pass via output vars)'
+    description:
+      'File path for the output file on disk (md is hard to pass via output
+      vars)'
     required: true
 
 # Define your outputs here.
