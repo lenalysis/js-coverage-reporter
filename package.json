@@ -1,16 +1,16 @@
 {
-  "name": "typescript-action",
-  "description": "GitHub Actions TypeScript template",
+  "name": "js-coverage-reporter",
+  "description": "JS Coverage Reporter",
   "version": "v0.1.3",
   "author": "",
   "private": true,
-  "homepage": "https://github.com/actions/typescript-action",
+  "homepage": "https://github.com/lenalysis/js-coverage-reporter",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/actions/typescript-action.git"
+    "url": "git+https://github.com/lenalysis/js-coverage-reporter.git"
   },
   "bugs": {
-    "url": "https://github.com/actions/typescript-action/issues"
+    "url": "https://github.com/lenalysis/js-coverage-reporter/issues"
   },
   "keywords": [
     "actions",
@@ -72,11 +72,10 @@
     "@jest/globals": "^29.7.0",
     "@types/jest": "^29.5.12",
     "@types/node": "^22.5.1",
-    "@typescript-eslint/eslint-plugin": "^7.17.0",
-    "@typescript-eslint/parser": "^7.18.0",
+    "@typescript-eslint/eslint-plugin": "^8.3.0",
+    "@typescript-eslint/parser": "^8.3.0",
     "@vercel/ncc": "^0.38.1",
     "eslint": "^8.57.0",
-    "eslint-plugin-github": "^5.0.1",
     "eslint-plugin-jest": "^28.8.0",
     "eslint-plugin-jsonc": "^2.16.0",
     "eslint-plugin-prettier": "^5.2.1",

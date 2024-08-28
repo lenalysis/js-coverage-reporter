@@ -1,6 +1,6 @@
-name: 'The name of your action here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'JS Coverage Reporter'
+description: 'Reads a coverage-summary.json and reports information to the build page'
+author: 'Lenalysis, Inc.'
 
 # Add your action's branding here. This will appear on the GitHub Marketplace.
 branding:
@@ -9,15 +9,27 @@ branding:
 
 # Define your inputs here.
 inputs:
-  milliseconds:
-    description: 'Your input description here'
+  title:
+    description: 'Title to use for report markdown'
+    required: false
+    default: 'Coverage Report'
+  src-base-path:
+    description: 'Source base path (to remove from links)'
     required: true
-    default: '1000'
+  url-base-path:
+    description: 'URL base path for repo files associated with this build'
+    required: true
+  json-summary-file-path:
+    description: 'JSON summary path (output file from IstanbulJS)'
+    required: true
+  output-file-path:
+    description: 'File path for the output file on disk (md is hard to pass via output vars)'
+    required: true
 
 # Define your outputs here.
 outputs:
-  time:
-    description: 'Your output description here'
+  coverage:
+    description: 'output markdown for the coverage result'
 
 runs:
   using: node20
