@@ -1,0 +1,66 @@
+{
+  "total": {
+    "lines": {
+      "total": 10963,
+      "covered": 2997,
+      "skipped": 0,
+      "pct": 27.33
+    },
+    "statements": {
+      "total": 11476,
+      "covered": 3196,
+      "skipped": 0,
+      "pct": 27.84
+    },
+    "functions": {
+      "total": 1676,
+      "covered": 522,
+      "skipped": 0,
+      "pct": 31.14
+    },
+    "branches": {
+      "total": 3442,
+      "covered": 937,
+      "skipped": 0,
+      "pct": 27.22
+    },
+    "branchesTrue": {
+      "total": 0,
+      "covered": 0,
+      "skipped": 0,
+      "pct": 100
+    }
+  },
+  "/usr/app/src/src/application/file1.js": {
+    "lines": {
+      "total": 10963,
+      "covered": 2997,
+      "skipped": 0,
+      "pct": 27.33
+    },
+    "statements": {
+      "total": 11476,
+      "covered": 3196,
+      "skipped": 0,
+      "pct": 27.84
+    },
+    "functions": {
+      "total": 1676,
+      "covered": 522,
+      "skipped": 0,
+      "pct": 31.14
+    },
+    "branches": {
+      "total": 3442,
+      "covered": 937,
+      "skipped": 0,
+      "pct": 27.22
+    },
+    "branchesTrue": {
+      "total": 0,
+      "covered": 0,
+      "skipped": 0,
+      "pct": 100
+    }
+  }
+}

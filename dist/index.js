@@ -24960,51 +24960,136 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.run = run;
 const core = __importStar(__nccwpck_require__(2186));
-const wait_1 = __nccwpck_require__(5259);
+const read_json_summary_file_1 = __nccwpck_require__(756);
+const write_file_async_1 = __nccwpck_require__(317);
 /**
  * The main function for the action.
  * @returns {Promise<void>} Resolves when the action is complete.
  */
 async function run() {
     try {
-        const ms = core.getInput('milliseconds');
-        // Debug logs are only output if the `ACTIONS_STEP_DEBUG` secret is true
-        core.debug(`Waiting ${ms} milliseconds ...`);
-        // Log the current timestamp, wait, then log the new timestamp
-        core.debug(new Date().toTimeString());
-        await (0, wait_1.wait)(parseInt(ms, 10));
-        core.debug(new Date().toTimeString());
-        // Set outputs for other workflow steps to use
-        core.setOutput('time', new Date().toTimeString());
+        const title = core.getInput('title');
+        const srcBasePath = core.getInput('src-base-path');
+        const urlBasePath = core.getInput('url-base-path');
+        const jsonSummaryFilePath = core.getInput('json-summary-file-path');
+        const outputFilePath = core.getInput('output-file-path');
+        core.debug(`Title: ${title}`);
+        core.debug(`SrcBasePath: ${srcBasePath}`);
+        core.debug(`UrlBasePath: ${urlBasePath}`);
+        core.debug(`JsonSummaryFilePath: ${jsonSummaryFilePath}`);
+        core.debug(`OutputFilePath: ${outputFilePath}`);
+        const jsonSummary = await (0, read_json_summary_file_1.readJsonSummaryFile)(jsonSummaryFilePath);
+        const modifiedSummary = {};
+        const total = jsonSummary.total;
+        let md = '';
+        for (const key in jsonSummary) {
+            if (key === 'total') {
+                continue;
+            }
+            if (!key.startsWith(srcBasePath)) {
+                core.debug(`key ${key} does not start with ${srcBasePath}`);
+                continue;
+            }
+            const modifiedKey = key.substring(srcBasePath.length);
+            modifiedSummary[modifiedKey] = jsonSummary[key];
+        }
+        core.debug(`Modified summary: ${JSON.stringify(modifiedSummary)}`);
+        md += `### ${title}\n`;
+        md += '|File|% Stmts|% Branch|% Funcs|% Lines\n';
+        md += '|----|-------|--------|-------|-------\n';
+        md += `|(total)|${total.statements.pct}|${total.branches.pct}|${total.functions.pct}|${total.lines.pct}\n`;
+        for (const shortName in modifiedSummary) {
+            const fullName = `${urlBasePath}/${shortName}`;
+            const entry = modifiedSummary[shortName];
+            md += `|[${shortName}](${fullName})|${entry.statements.pct}|${entry.branches.pct}|${entry.functions.pct}|${entry.lines.pct}\n`;
+        }
+        await (0, write_file_async_1.writeFileAsync)(outputFilePath, md);
+        core.setOutput('coverage', md);
     }
     catch (error) {
         // Fail the workflow run if an error occurs
-        if (error instanceof Error)
-            core.setFailed(error.message);
+        const err = error;
+        if (err) {
+            core.setFailed(err.message);
+        }
     }
 }
 
 
 /***/ }),
 
-/***/ 5259:
-/***/ ((__unused_webpack_module, exports) => {
+/***/ 756:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.wait = wait;
+exports.readJsonSummaryFile = readJsonSummaryFile;
+const fs = __importStar(__nccwpck_require__(7147));
 /**
- * Wait for a number of milliseconds.
- * @param milliseconds The number of milliseconds to wait.
- * @returns {Promise<string>} Resolves with 'done!' after the wait is over.
+ * @param {string} fileName - The name of the file to read
+ * @returns {Promise<CoverageSummary>} - the JSON contents of the file
  */
-async function wait(milliseconds) {
-    return new Promise(resolve => {
-        if (isNaN(milliseconds)) {
-            throw new Error('milliseconds not a number');
-        }
-        setTimeout(() => resolve('done!'), milliseconds);
+async function readJsonSummaryFile(fileName) {
+    return new Promise((resolve, reject) => {
+        fs.readFile(fileName, 'utf8', (err, data) => {
+            if (err)
+                reject(err);
+            try {
+                resolve(JSON.parse(data));
+            }
+            catch (err) {
+                reject(err);
+            }
+        });
+    });
+}
+
+
+/***/ }),
+
+/***/ 317:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.writeFileAsync = writeFileAsync;
+const node_fs_1 = __importDefault(__nccwpck_require__(7561));
+async function writeFileAsync(fileName, contents) {
+    return new Promise((resolve, reject) => {
+        node_fs_1.default.writeFile(fileName, contents, {}, err => {
+            if (err)
+                reject(err);
+            else
+                resolve();
+        });
     });
 }
 
@@ -25112,6 +25197,14 @@ module.exports = require("net");
 
 "use strict";
 module.exports = require("node:events");
+
+/***/ }),
+
+/***/ 7561:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("node:fs");
 
 /***/ }),
 
