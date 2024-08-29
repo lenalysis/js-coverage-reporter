@@ -1,5 +1,6 @@
 import * as core from '@actions/core'
-import { wait } from './wait'
+import { CoverageSummary, readJsonSummaryFile } from './read-json-summary-file'
+import { writeFileAsync } from './write-file-async'
 
 /**
  * The main function for the action.
@@ -7,20 +8,58 @@ import { wait } from './wait'
  */
 export async function run(): Promise<void> {
   try {
-    const ms: string = core.getInput('milliseconds')
+    const title: string = core.getInput('title')
+    const srcBasePath: string = core.getInput('src-base-path')
+    const urlBasePath: string = core.getInput('url-base-path')
+    const jsonSummaryFilePath: string = core.getInput('json-summary-file-path')
+    const outputFilePath: string = core.getInput('output-file-path')
 
-    // Debug logs are only output if the `ACTIONS_STEP_DEBUG` secret is true
-    core.debug(`Waiting ${ms} milliseconds ...`)
+    core.debug(`Title: ${title}`)
+    core.debug(`SrcBasePath: ${srcBasePath}`)
+    core.debug(`UrlBasePath: ${urlBasePath}`)
+    core.debug(`JsonSummaryFilePath: ${jsonSummaryFilePath}`)
+    core.debug(`OutputFilePath: ${outputFilePath}`)
 
-    // Log the current timestamp, wait, then log the new timestamp
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
+    const jsonSummary = await readJsonSummaryFile(jsonSummaryFilePath)
+    const modifiedSummary: CoverageSummary = {}
+    const total = jsonSummary.total
+    let md = ''
+    for (const key in jsonSummary) {
+      if (key === 'total') {
+        continue
+      }
+      if (!key.startsWith(srcBasePath)) {
+        core.debug(`key ${key} does not start with ${srcBasePath}`)
+        continue
+      }
+      const modifiedKey = key.substring(srcBasePath.length)
+      modifiedSummary[modifiedKey] = jsonSummary[key]
+    }
 
-    // Set outputs for other workflow steps to use
-    core.setOutput('time', new Date().toTimeString())
+    core.debug(`Modified summary: ${JSON.stringify(modifiedSummary)}`)
+
+    md += `### ${title}`
+    md += 'File|% Stmts|% Branch|% Funcs|% Lines\n'
+    md += '----|-------|--------|-------|-------\n'
+    md += `(total)|${total.statements.pct}|${total.branches.pct}|${total.functions.pct}|${total.lines.pct}\n`
+    for (const shortName in modifiedSummary) {
+      const fullName = `${urlBasePath}/${shortName}`
+      const entry = modifiedSummary[shortName]
+      md += `![${shortName}](${fullName})|${entry.statements.pct}|${entry.branches.pct}|${entry.functions.pct}|${entry.lines.pct}\n`
+    }
+
+    await writeFileAsync(outputFilePath, md)
+
+    core.setOutput('coverage', md)
   } catch (error) {
     // Fail the workflow run if an error occurs
-    if (error instanceof Error) core.setFailed(error.message)
+    const err = error as ErrorWithMessage
+    if (err) {
+      core.setFailed(err.message)
+    }
   }
+}
+
+interface ErrorWithMessage {
+  message: string
 }

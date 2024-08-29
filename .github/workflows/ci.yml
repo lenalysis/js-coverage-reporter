@@ -57,8 +57,12 @@ jobs:
         id: test-action
         uses: ./
         with:
-          milliseconds: 2000
+          title: 'Coverage report'
+          json-summary-file-path: './__tests__/data/jsonSummary.json'
+          src-base-path: '/usr/app/src/src'
+          output-file-path: './output.md'
+          url-base-path: 'project/base/tree/git-hash/src'
 
       - name: Print Output
         id: output
-        run: echo "${{ steps.test-action.outputs.time }}"
+        run: echo "${{ steps.test-action.outputs.coverage }}"
