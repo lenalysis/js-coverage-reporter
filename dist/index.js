@@ -24999,7 +24999,7 @@ async function run() {
         md += '|----|-------|--------|-------|-------\n';
         md += `|(total)|${total.statements.pct}|${total.branches.pct}|${total.functions.pct}|${total.lines.pct}\n`;
         for (const shortName in modifiedSummary) {
-            const fullName = `${urlBasePath}/${shortName}`;
+            const fullName = `${urlBasePath}${shortName}`;
             const entry = modifiedSummary[shortName];
             md += `|[${shortName}](${fullName})|${entry.statements.pct}|${entry.branches.pct}|${entry.functions.pct}|${entry.lines.pct}\n`;
         }
